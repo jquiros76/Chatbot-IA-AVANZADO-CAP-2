@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot IA Avanzado · Capítulo 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0c1a;--bg2:#130f22;--bg3:#1a1530;
+  --card:#1c1830;--card2:#221e38;
+  --border:#2d2850;--border2:#3e3870;
+  --ink:#f0ecff;--ink2:#c4b8f0;--muted:#7868b0;
+  --purple:#b87aff;--purple-g:#b87aff28;
+  --pink:#f472b6;--pink-g:#f472b622;
+  --teal:#2dd4bf;--teal-g:#2dd4bf1e;
+  --amber:#fbbf24;--amber-g:#fbbf2420;
+  --green:#4ade80;--green-g:#4ade8018;
+  --red:#f87171;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.018) 2px,rgba(0,0,0,.018) 4px);pointer-events:none;z-index:9999}
+
+.hero{padding:56px 48px 48px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 50% 70% at 75% 10%,#b87aff18,transparent),radial-gradient(ellipse 40% 50% at 15% 90%,#2dd4bf0c,transparent);pointer-events:none}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.eyebrow-chip{display:inline-flex;align-items:center;gap:7px;background:var(--purple-g);border:1px solid var(--purple);border-radius:4px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--purple);letter-spacing:.06em}
+.eyebrow-dot{width:5px;height:5px;border-radius:50%;background:var(--pink);animation:blink 1.4s infinite}
+.hero-cap{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(2.2rem,5vw,4rem);font-weight:700;line-height:1.05;color:#fff;position:relative;z-index:1}
+.hero h1 .a1{color:var(--purple);font-style:italic}
+.hero h1 .a2{color:var(--teal)}
+.hero h1 .a3{color:var(--pink)}
+.hero-sub{margin-top:16px;font-size:1rem;color:#d4caf0;max-width:580px;line-height:1.75;font-weight:300;position:relative;z-index:1}
+.hero-stats{display:flex;gap:40px;margin-top:36px;flex-wrap:wrap;position:relative;z-index:1}
+.hstat{border-left:2px solid var(--border2);padding-left:16px}
+.hstat-val{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--purple);line-height:1}
+.hstat-lbl{font-size:.72rem;color:#b8aee0;margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 260px)}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:28px 0;position:sticky;top:0;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2)}
+.prog-wrap{padding:0 20px 24px;border-bottom:1px solid var(--border)}
+.prog-top{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);margin-bottom:8px}
+.prog-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:2px;transition:width .4s ease;width:0%}
+.nav-section{padding:20px 20px 6px;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.mod-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:none;border:none;cursor:pointer;color:var(--ink2);font-family:'Space Grotesk',sans-serif;font-size:.8rem;font-weight:600;text-align:left;transition:color .2s}
+.mod-btn:hover{color:var(--ink)}
+.mod-badge{font-family:'JetBrains Mono',monospace;font-size:.62rem;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:2px 7px;color:var(--muted)}
+.les-btn{width:100%;display:flex;align-items:center;gap:9px;padding:8px 20px 8px 32px;background:none;border:none;cursor:pointer;color:#b0a0e0;font-family:'Space Grotesk',sans-serif;font-size:.79rem;text-align:left;transition:all .18s;border-left:2px solid transparent;line-height:1.4}
+.les-btn:hover{color:var(--ink);background:var(--bg3)}
+.les-btn.active{color:var(--purple);background:var(--purple-g);border-left-color:var(--purple)}
+.les-btn.done .lcheck{color:var(--green);opacity:1}
+.lcheck{font-size:.68rem;opacity:.35;flex-shrink:0}
+
+.content{padding:48px 56px;max-width:900px}
+.lhdr{margin-bottom:40px}
+.ltag{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.ltitle{font-family:'Fraunces',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;color:#fff;line-height:1.15}
+.ldesc{margin-top:14px;color:#d4caf0;font-size:.97rem;line-height:1.8;font-weight:300}
+.sec{margin-bottom:44px}
+.sec-title{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
+.body{color:#ece4ff;font-size:.94rem;line-height:1.9;font-weight:300}
+.body strong{color:#fff;font-weight:600}
+.body code{font-family:'JetBrains Mono',monospace;font-size:.82rem;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 6px;color:var(--teal)}
+
+.code-wrap{margin:20px 0;border-radius:10px;overflow:hidden;border:1px solid var(--border2)}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--card2);border-bottom:1px solid var(--border)}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--purple);letter-spacing:.08em;text-transform:uppercase}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted)}
+.code-dots{display:flex;gap:5px}
+.code-dot{width:10px;height:10px;border-radius:50%}
+.code-body{background:#080518;padding:20px 22px;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.85;overflow-x:auto;color:#e8daf8}
+.code-body .cm{color:#7868a8}
+.code-body .ck{color:#d494ff}
+.code-body .cs{color:#ffe08a}
+.code-body .cn{color:#ffb8d8}
+.code-body .cb{color:#40e0d0}
+.code-body .cv{color:#a8f0ff}
+
+.steps{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.step{display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;transition:border-color .2s}
+.step:hover{border-color:var(--border2)}
+.step-num{width:32px;height:32px;border-radius:8px;background:var(--purple-g);border:1px solid var(--purple);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--purple);font-weight:700;flex-shrink:0}
+.step-content h4{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:5px}
+.step-content p{font-size:.82rem;color:#c4b8e8;line-height:1.6}
+.step-content code{font-family:'JetBrains Mono',monospace;font-size:.78rem;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 6px;color:var(--teal)}
+
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-top:16px}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 16px;transition:all .2s}
+.ccard:hover{border-color:var(--border2);transform:translateY(-2px)}
+.ccard-icon{font-size:1.5rem;margin-bottom:10px}
+.ccard-title{font-size:.87rem;font-weight:700;color:#fff;margin-bottom:5px}
+.ccard-text{font-size:.78rem;color:#c0b4e0;line-height:1.6}
+
+.tbl{width:100%;border-collapse:collapse;font-size:.84rem;margin-top:14px}
+.tbl th{background:var(--card2);color:var(--pink);font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:11px 15px;text-align:left;border-bottom:1px solid var(--border2)}
+.tbl td{padding:10px 15px;border-bottom:1px solid var(--border);color:#e8e0ff;vertical-align:top}
+.tbl tr:hover td{background:var(--card)}
+
+.callout{border-radius:10px;padding:18px 22px;margin:22px 0;border:1px solid}
+.callout-lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.callout p{font-size:.87rem;line-height:1.7;color:var(--ink)}
+.callout-warn{background:#2a1e08;border-color:var(--amber)}.callout-warn .callout-lbl{color:var(--amber)}
+.callout-tip{background:#0a1e1c;border-color:var(--teal)}.callout-tip .callout-lbl{color:var(--teal)}
+.callout-ok{background:#0d1f14;border-color:var(--green)}.callout-ok .callout-lbl{color:var(--green)}
+.callout-info{background:#1a1030;border-color:var(--purple)}.callout-info .callout-lbl{color:var(--purple)}
+
+.flow{display:flex;align-items:stretch;flex-wrap:wrap;gap:0;margin:18px 0}
+.flow-node{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;min-width:120px;text-align:center}
+.flow-node .fn-label{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--purple);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.flow-node .fn-text{font-size:.8rem;color:var(--ink);line-height:1.4}
+.flow-arrow{display:flex;align-items:center;padding:0 6px;color:var(--muted);font-size:1rem;flex-shrink:0}
+
+.tag{display:inline-block;padding:2px 10px;border-radius:100px;font-size:.7rem;font-weight:600;font-family:'JetBrains Mono',monospace}
+.tag-p{background:var(--purple-g);color:var(--purple);border:1px solid var(--purple)}
+.tag-t{background:var(--teal-g);color:var(--teal);border:1px solid var(--teal)}
+.tag-a{background:var(--amber-g);color:var(--amber);border:1px solid var(--amber)}
+.tag-g{background:var(--green-g);color:var(--green);border:1px solid var(--green)}
+.tag-r{background:#3a0e0e;color:var(--red);border:1px solid var(--red)}
+
+.complete-btn{display:block;width:100%;margin-top:36px;padding:15px;background:transparent;border:1px solid var(--purple);border-radius:8px;color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:.82rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.complete-btn:hover{background:var(--purple-g)}
+.complete-btn.done{background:#0d2018;color:var(--green);border-color:var(--green)}
+.lesson-nav{display:flex;justify-content:space-between;margin-top:48px;padding-top:28px;border-top:1px solid var(--border)}
+.nav-btn{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 20px;cursor:pointer;color:var(--ink);font-family:'Space Grotesk',sans-serif;font-size:.84rem;font-weight:600;transition:all .2s}
+.nav-btn:hover{border-color:var(--purple);color:var(--purple)}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.nav-btn:disabled:hover{border-color:var(--border);color:var(--ink)}
+.nav-btn.primary{background:var(--purple);color:#fff;border-color:var(--purple)}
+.nav-btn.primary:hover{background:var(--pink);border-color:var(--pink)}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.lhdr,.sec{animation:fadeUp .35s ease both}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  .content{padding:28px 20px}
+  .hero{padding:36px 20px 32px}
+  .flow{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg);padding:4px 0}
+}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-eyebrow">
+    <div class="eyebrow-chip"><span class="eyebrow-dot"></span> Nivel Avanzado</div>
+    <span class="hero-cap">Capítulo 2 de 2</span>
+  </div>
+  <h1>CRM · <span class="a1">Pagos</span> · <span class="a2">OAuth</span><br>Multi-<span class="a3">Cliente</span></h1>
+  <p class="hero-sub">Integración con HubSpot y Pipedrive, pagos automatizados, autenticación de usuarios, arquitectura multi-tenant y deployment profesional.</p>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-val">5</div><div class="hstat-lbl">Módulos</div></div>
+    <div class="hstat"><div class="hstat-val">~3h</div><div class="hstat-lbl">Contenido</div></div>
+    <div class="hstat"><div class="hstat-val">15+</div><div class="hstat-lbl">Integraciones reales</div></div>
+  </div>
+</div>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="prog-wrap">
+    <div class="prog-top"><span>Progreso</span><span id="pct">0%</span></div>
+    <div class="prog-track"><div class="prog-bar" id="pbar"></div></div>
+  </div>
+  <div class="nav-section">Módulos</div>
+  <div id="sidenav"></div>
+</aside>
+<main class="content" id="content"></main>
+</div>
+
+<script>
+var MODS=[
+{id:'m1',title:'Integración con CRMs',lessons:[
+{id:'l1-1',title:'Conectar HubSpot con Make.com',content:function(){return `
+<div class="lhdr">
+  <div class="ltag">Módulo 1 · Lección 1</div>
+  <h2 class="ltitle">Conectar HubSpot con Make.com vía API</h2>
+  <p class="ldesc">Cuando el chatbot captura un lead, debe crearlo automáticamente en tu CRM. Aprende a sincronizar contactos, deals y actividad de conversación con HubSpot usando Make.</p>
+</div>
+<div class="sec">
+  <div class="sec-title">Arquitectura de integración chatbot → HubSpot</div>
+  <div class="flow">
+    <div class="flow-node"><div class="fn-label">WhatsApp</div><div class="fn-text">Usuario envía mensaje</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">Make</div><div class="fn-text">Procesa con OpenAI</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">HubSpot</div><div class="fn-text">Crear/actualizar contacto</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">HubSpot</div><div class="fn-text">Crear deal y actividad</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">Vendedor</div><div class="fn-text">Recibe lead calificado</div></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Configurar HubSpot en Make.com</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><div class="step-content"><h4>Crear Private App en HubSpot</h4><p>En HubSpot: Settings → Integrations → Private Apps → Create private app. Nombre: "Chatbot WhatsApp". Scopes necesarios: <code>crm.objects.contacts.write</code>, <code>crm.objects.deals.write</code>, <code>crm.objects.notes.write</code>.</p></div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-content"><h4>Copiar el Access Token</h4><p>HubSpot genera un token de acceso permanente (no expira). Guárdalo de forma segura — lo usarás como Bearer token en Make.</p></div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-content"><h4>Conectar en Make</h4><p>En Make, agrega el módulo <strong>HubSpot CRM → Create/Update a Contact</strong>. En la conexión, selecciona <strong>API Key</strong> e ingresa tu Private App token.</p></div></div>
+    <div class="step"><div class="step-num">04</div><div class="step-content"><h4>Configurar campos del contacto</h4><p>Mapea los datos del chatbot a propiedades de HubSpot: <code>firstname</code> = <code>{{ProfileName}}</code>, <code>phone</code> = <code>{{WaId}}</code>, <code>hs_lead_source</code> = "WhatsApp Chatbot".</p></div></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Crear Deal y Nota de conversación automáticamente</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><div class="code-dot" style="background:#ff5f57"></div><div class="code-dot" style="background:#febc2e"></div><div class="code-dot" style="background:#28c840"></div></div><span class="code-lang">HTTP POST</span><span class="code-file">HubSpot API — Crear Deal</span></div>
+    <div class="code-body">
+<span class="ck">URL</span>: <span class="cs">https://api.hubapi.com/crm/v3/objects/deals</span>
+<span class="ck">Method</span>: POST
+<span class="ck">Authorization</span>: Bearer <span class="cv">{{hubspot_token}}</span>
+<span class="ck">Content-Type</span>: application/json
+
+<span class="cm"># Body:</span>
+{
+  <span class="ck">"properties"</span>: {
+    <span class="ck">"dealname"</span>: <span class="cs">"Lead WhatsApp - {{ProfileName}}"</span>,
+    <span class="ck">"pipeline"</span>: <span class="cs">"default"</span>,
+    <span class="ck">"dealstage"</span>: <span class="cs">"appointmentscheduled"</span>,
+    <span class="ck">"amount"</span>: <span class="cb">0</span>,
+    <span class="ck">"closedate"</span>: <span class="cv">{{addDays(now; 30)}}</span>,
+    <span class="ck">"hs_lead_source"</span>: <span class="cs">"CHAT"</span>,
+    <span class="ck">"description"</span>: <span class="cs">"Capturado por chatbot: {{resumen_conversacion}}"</span>
+  },
+  <span class="ck">"associations"</span>: [{
+    <span class="ck">"to"</span>: { <span class="ck">"id"</span>: <span class="cv">{{contacto_id}}</span> },
+    <span class="ck">"types"</span>: [{
+      <span class="ck">"associationCategory"</span>: <span class="cs">"HUBSPOT_DEFINED"</span>,
+      <span class="ck">"associationTypeId"</span>: <span class="cb">3</span>
+    }]
+  }]
+}
+    </div>
+  </div>
+</div>
+<div class="callout callout-tip">
+  <div class="callout-lbl">💡 Tip: Upsert en lugar de crear</div>
+  <p>Usa el endpoint <code>/crm/v3/objects/contacts/upsert</code> con el número de teléfono como ID único. Esto crea el contacto si no existe, o actualiza si ya existe. Evitas duplicados sin lógica adicional en Make.</p>
+</div>`;}},
+{id:'l1-2',title:'Pipedrive: crear deals desde el chatbot',content:function(){return `
+<div class="lhdr">
+  <div class="ltag">Módulo 1 · Lección 2</div>
+  <h2 class="ltitle">Pipedrive: Pipeline de Ventas Automatizado desde WhatsApp</h2>
+  <p class="ldesc">Pipedrive es la alternativa más visual para gestión de ventas. Aprende a crear personas, deals y actividades automáticamente cuando el chatbot califica un lead.</p>
+</div>
+<div class="sec">
+  <div class="sec-title">Obtener API Key de Pipedrive</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><div class="step-content"><h4>Generar API Token</h4><p>En Pipedrive: Settings → Personal → API. Copia el API Token personal. Para producción, usa <strong>OAuth 2.0</strong> con una app de Marketplace para evitar tokens personales.</p></div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-content"><h4>Configurar conexión en Make</h4><p>Agrega módulo <strong>Pipedrive → Create a Person</strong>. En la conexión, ingresa tu API Token. Make usará el dominio <code>tuempresa.pipedrive.com</code> automáticamente.</p></div></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Flujo completo: chatbot → Pipedrive en Make</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><div class="code-dot" style="background:#ff5f57"></div><div class="code-dot" style="background:#febc2e"></div><div class="code-dot" style="background:#28c840"></div></div><span class="code-lang">LÓGICA</span><span class="code-file">Escenario Make — Pipedrive Integration</span></div>
+    <div class="code-body">
+<span class="cm"># Módulo 1: Webhook (recibe datos del chatbot)</span>
+<span class="cv">{{nombre}}</span>, <span class="cv">{{telefono}}</span>, <span class="cv">{{intencion}}</span>, <span class="cv">{{presupuesto}}</span>
+
+<span class="cm"># Módulo 2: Pipedrive → Search for a Person</span>
+<span class="ck">Search field</span>: phone
+<span class="ck">Term</span>: <span class="cv">{{telefono}}</span>
+<span class="cm">→ Si existe: obtiene person_id</span>
+<span class="cm">→ Si no existe: continúa al módulo 3</span>
+
+<span class="cm"># Módulo 3: Router (existe/no existe en Pipedrive)</span>
+<span class="ck">Ruta A</span>: persona YA existe → solo crear deal
+<span class="ck">Ruta B</span>: persona NUEVA → crear persona Y deal
+
+<span class="cm"># Módulo 4B: Pipedrive → Create a Person</span>
+{
+  <span class="ck">"name"</span>: <span class="cv">{{nombre}}</span>,
+  <span class="ck">"phone"</span>: [{ <span class="ck">"value"</span>: <span class="cv">{{telefono}}</span>, <span class="ck">"primary"</span>: <span class="cb">true</span> }],
+  <span class="ck">"label"</span>: <span class="cs">"whatsapp-chatbot"</span>
+}
+
+<span class="cm"># Módulo 5: Pipedrive → Create a Deal</span>
+{
+  <span class="ck">"title"</span>: <span class="cs">"WA Lead: {{nombre}} — {{intencion}}"</span>,
+  <span class="ck">"person_id"</span>: <span class="cv">{{person_id}}</span>,
+  <span class="ck">"pipeline_id"</span>: <span class="cb">1</span>,
+  <span class="ck">"stage_id"</span>: <span class="cb">1</span>,
+  <span class="ck">"value"</span>: <span class="cv">{{presupuesto}}</span>
+}
+
+<span class="cm"># Módulo 6: Pipedrive → Create an Activity</span>
+<span class="cm"># Agendar follow-up automático para mañana a las 9am</span>
+{
+  <span class="ck">"type"</span>: <span class="cs">"call"</span>,
+  <span class="ck">"subject"</span>: <span class="cs">"Llamar a {{nombre}} — lead WhatsApp"</span>,
+  <span class="ck">"deal_id"</span>: <span class="cv">{{deal_id}}</span>,
+  <span class="ck">"due_date"</span>: <span class="cv">{{formatDate(addDays(now;1);"YYYY-MM-DD")}}</span>
+}
+    </div>
+  </div>
+</div>
+<div class="callout callout-ok">
+  <div class="callout-lbl">✅ Resultado en Pipedrive</div>
+  <p>El vendedor llega por la mañana y encuentra en su pipeline: una nueva persona, un deal en etapa inicial y una actividad de "llamar" agendada para hoy. Todo creado automáticamente por el chatbot que operó de madrugada.</p>
+</div>`;}},
+]},
+{id:'m2',title:'Pagos Automatizados',lessons:[
+{id:'l2-1',title:'Cobrar con Stripe desde WhatsApp',content:function(){return `
+<div class="lhdr">
+  <div class="ltag">Módulo 2 · Lección 1</div>
+  <h2 class="ltitle">Cobrar con Stripe desde WhatsApp vía Chatbot</h2>
+  <p class="ldesc">Cierra ventas directamente en la conversación de WhatsApp. Aprende a generar Payment Links de Stripe desde Make y enviarlos al usuario para que pague sin salir de WhatsApp.</p>
+</div>
+<div class="sec">
+  <div class="sec-title">Flujo de cobro en WhatsApp</div>
+  <div class="flow">
+    <div class="flow-node"><div class="fn-label">Usuario</div><div class="fn-text">"Quiero comprar el plan Pro"</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">OpenAI</div><div class="fn-text">Confirmar intención de compra</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">Make</div><div class="fn-text">Crear Payment Link en Stripe</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">Twilio</div><div class="fn-text">Enviar link al usuario</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">Stripe</div><div class="fn-text">Webhook: pago completado</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node"><div class="fn-label">Make</div><div class="fn-text">Confirmar y activar acceso</div></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Crear Payment Link de Stripe desde Make</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><div class="code-dot" style="background:#ff5f57"></div><div class="code-dot" style="background:#febc2e"></div><div class="code-dot" style="background:#28c840"></div></div><span class="code-lang">HTTP POST</span><span class="code-file">Make → Stripe API</span></div>
+    <div class="code-body">
+<span class="ck">URL</span>: <span class="cs">https://api.stripe.com/v1/payment_links</span>
+<span class="ck">Method</span>: POST
+<span class="ck">Authorization</span>: Bearer <span class="cv">{{stripe_secret_key}}</span>
+<span class="ck">Content-Type</span>: application/x-www-form-urlencoded
+
+<span class="cm"># Body (form-urlencoded):</span>
+<span class="ck">line_items[0][price]</span>=<span class="cs">price_xxxxxxxxxxxxxxxx</span>  <span class="cm"># Price ID del producto en Stripe</span>
+<span class="ck">line_items[0][quantity]</span>=<span class="cb">1</span>
+<span class="ck">after_completion[type]</span>=<span class="cs">redirect</span>
+<span class="ck">after_completion[redirect][url]</span>=<span class="cs">https://tudominio.com/gracias</span>
+<span class="ck">metadata[whatsapp_number]</span>=<span class="cv">{{WaId}}</span>  <span class="cm"># para identificar al comprador</span>
+<span class="ck">metadata[product]</span>=<span class="cs">plan_pro</span>
+
+<span class="cm"># Respuesta de Stripe incluye:</span>
+<span class="cm"># { "url": "https://buy.stripe.com/xxxxxxxx" }</span>
+<span class="cm"># Envía este URL al usuario por WhatsApp</span>
+    </div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Webhook de Stripe: confirmar pago y dar acceso</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><div class="code-dot" style="background:#ff5f57"></div><div class="code-dot" style="background:#febc2e"></div><div class="code-dot" style="background:#28c840"></div></div><span class="code-lang">JSON</span><span class="code-file">Stripe Webhook → Make (checkout.session.completed)</span></div>
+    <div class="code-body">
+<span class="cm"># Cuando el usuario paga, Stripe dispara este evento</span>
+{
+  <span class="ck">"type"</span>: <span class="cs">"checkout.session.completed"</span>,
+  <span class="ck">"data"</span>: {
+    <span class="ck">"object"</span>: {
+      <span class="ck">"id"</span>: <span class="cs">"cs_xxxxxxxxxxxxxxxx"</span>,
+      <span class="ck">"payment_status"</span>: <span class="cs">"paid"</span>,
+      <span class="ck">"customer_details"</span>: {
+        <span class="ck">"email"</span>: <span class="cs">"jose@email.com"</span>,
+        <span class="ck">"name"</span>: <span class="cs">"José Quiros"</span>
+      },
+      <span class="ck">"metadata"</span>: {
+        <span class="ck">"whatsapp_number"</span>: <span class="cs">"50688888888"</span>,
+        <span class="ck">"product"</span>: <span class="cs">"plan_pro"</span>
+      },
+      <span class="ck">"amount_total"</span>: <span class="cb">4900</span>
+    }
+  }
+}
+
+<span class="cm"># Con whatsapp_number, Make puede:</span>
+<span class="cm"># 1. Enviar mensaje de confirmación por WhatsApp</span>
+<span class="cm"># 2. Actualizar plan del cliente en Airtable</span>
+<span class="cm"># 3. Crear registro en HubSpot/Pipedrive</span>
+    </div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Mensaje de confirmación post-pago</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><div class="step-content"><h4>Crear escenario de confirmación en Make</h4><p>Crea un escenario nuevo con trigger <strong>Webhooks → Custom Webhook</strong>. Este webhook lo registras en el dashboard de Stripe en <strong>Developers → Webhooks</strong>. Evento a escuchar: <code>checkout.session.completed</code>.</p></div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-content"><h4>Extraer número de WhatsApp del metadata</h4><p>Del payload de Stripe, extrae <code>{{data.object.metadata.whatsapp_number}}</code>. Formatea como <code>whatsapp:+{{numero}}</code> para Twilio.</p></div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-content"><h4>Enviar mensaje de bienvenida personalizado</h4><p>Usa Twilio para enviar: <em>"🎉 ¡Pago confirmado, José! Tu acceso al Plan Pro está activo. Aquí están tus credenciales: [link]. Bienvenido a Ruta360."</em></p></div></div>
+    <div class="step"><div class="step-num">04</div><div class="step-content"><h4>Actualizar Airtable y CRM</h4><p>Actualiza el registro del usuario: <code>plan = "Pro"</code>, <code>fecha_pago = now</code>, <code>stripe_session_id = cs_xxx</code>. En HubSpot, mueve el deal a etapa "Closed Won".</p></div></div>
+  </div>
+</div>`;}},
+]},
+{id:'m3',title:'Autenticación de Usuarios',lessons:[
+{id:'l3-1',title:'Identificar usuarios recurrentes por número',content:function(){return `
+<div class="lhdr">
+  <div class="ltag">Módulo 3 · Lección 1</div>
+  <h2 class="ltitle">Identificar y Autenticar Usuarios Recurrentes</h2>
+  <p class="ldesc">El número de WhatsApp es el identificador único del usuario. Aprende a usarlo para ofrecer experiencias personalizadas: el bot recuerda quién es el cliente, su plan y su historial.</p>
+</div>
+<div class="sec">
+  <div class="sec-title">El número de WhatsApp como identidad</div>
+  <p class="body">A diferencia de una app o web, en WhatsApp <strong>el número de teléfono es la identidad</strong>. No necesitas login, contraseña ni cookies. Cada mensaje incluye el <code>WaId</code> del remitente — úsalo como clave primaria en todo tu sistema.</p>
+  <div class="callout callout-info">
+    <div class="callout-lbl">📐 Principio de diseño</div>
+    <p>Diseña todo tu sistema con <code>WaId</code> como foreign key universal. Un mismo número aparece en: tabla de clientes, tabla de historial, tabla de pagos, CRM. Puedes relacionar toda la información sin que el usuario haga nada adicional.</p>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Flujo de identificación en cada mensaje</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><div class="code-dot" style="background:#ff5f57"></div><div class="code-dot" style="background:#febc2e"></div><div class="code-dot" style="background:#28c840"></div></div><span class="code-lang">LÓGICA</span><span class="code-file">Identificación de usuario en Make</span></div>
+    <div class="code-body">
+<span class="cm"># Al recibir cualquier mensaje:</span>
+<span class="ck">WaId</span> = <span class="cv">{{1.WaId}}</span>  <span class="cm">← del webhook de Twilio</span>
+
+<span class="cm"># Buscar en Airtable tabla "Clientes"</span>
+<span class="ck">Filter</span>: phone_number = <span class="cv">{{WaId}}</span>
+
+<span class="cm"># Router basado en si existe el registro:</span>
+<span class="ck">EXISTE</span> → Cliente conocido:
+  - Obtener: nombre, plan, historial, última_visita
+  - System Prompt: "El cliente es {{nombre}}, con plan {{plan}}"
+  - Actualizar: última_visita = now
+
+<span class="ck">NO EXISTE</span> → Nuevo usuario:
+  - Crear registro básico con WaId y ProfileName
+  - System Prompt: "Es un usuario nuevo, preguntar nombre"
+  - Flujo de onboarding (capturar datos)
+    </div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Acceso condicional por plan</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><div class="code-dot" style="background:#ff5f57"></div><div class="code-dot" style="background:#febc2e"></div><div class="code-dot" style="background:#28c840"></div></div><span class="code-lang">LÓGICA</span><span class="code-file">Control de acceso por suscripción</span></div>
+    <div class="code-body">
+<span class="cm"># Si el usuario pide una función premium:</span>
+
+<span class="ck">plan_usuario</span> = <span class="cv">{{cliente.plan}}</span>  <span class="cm">← de Airtable</span>
+
+SI <span class="ck">plan_usuario</span> = <span class="cs">"Pro"</span> O <span class="cs">"Premium"</span>:
+  → Responder con la función solicitada
+  → OpenAI con System Prompt completo + datos premium
+
+SI <span class="ck">plan_usuario</span> = <span class="cs">"Gratis"</span>:
+  → Twilio envía: "Esta función está disponible en el Plan Pro.
+    ¿Te gustaría conocer los beneficios? 🚀"
+  → Insertar CTA de upgrade con Payment Link
+    </div>
+  </div>
+</div>
+<div class="callout callout-tip">
+  <div class="callout-lbl">💡 Validar membresía activa</div>
+  <p>Además del plan, verifica <code>fecha_vencimiento</code> en Airtable. Si el plan venció, el bot puede recordar al cliente renovar y enviarle un link de pago automáticamente — sin que ningún humano intervenga.</p>
+</div>`;}},
+]},
+{id:'m4',title:'Arquitectura Multi-Cliente',lessons:[
+{id:'l4-1',title:'Un sistema para múltiples negocios',content:function(){return `
+<div class="lhdr">
+  <div class="ltag">Módulo 4 · Lección 1</div>
+  <h2 class="ltitle">Arquitectura Multi-Tenant: Un Sistema para Muchos Clientes</h2>
+  <p class="ldesc">Cuando tienes múltiples clientes usando tu servicio de chatbot, necesitas una arquitectura que aísle los datos de cada uno pero comparta la infraestructura. Aprende el patrón multi-tenant.</p>
+</div>
+<div class="sec">
+  <div class="sec-title">Opciones de arquitectura</div>
+  <div class="cgrid">
+    <div class="ccard" style="border-color:var(--red)"><div class="ccard-icon">❌</div><div class="ccard-title" style="color:var(--red)">Un escenario por cliente</div><div class="ccard-text">No escala. 10 clientes = 10 escenarios duplicados. Mantenimiento imposible.</div></div>
+    <div class="ccard" style="border-color:var(--amber)"><div class="ccard-icon">⚠️</div><div class="ccard-title" style="color:var(--amber)">Escenario compartido sin aislamiento</div><div class="ccard-text">Un solo escenario pero datos mezclados. Riesgo de privacidad y errores.</div></div>
+    <div class="ccard" style="border-color:var(--green)"><div class="ccard-icon">✅</div><div class="ccard-title" style="color:var(--green)">Multi-tenant con tenant_id</div><div class="ccard-text">Un escenario, datos separados por tenant_id. Escala sin límite.</div></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Implementación: tenant_id como clave universal</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><div class="code-dot" style="background:#ff5f57"></div><div class="code-dot" style="background:#febc2e"></div><div class="code-dot" style="background:#28c840"></div></div><span class="code-lang">ARQUITECTURA</span><span class="code-file">Diseño Multi-Tenant en Airtable + Make</span></div>
+    <div class="code-body">
+<span class="cm"># En Airtable: tabla "Tenants" (configuración por cliente)</span>
+<span class="ck">tenant_id</span>      = <span class="cs">"tenant_001"</span>
+<span class="ck">twilio_number</span>  = <span class="cs">"+14155238886"</span>
+<span class="ck">openai_key</span>     = <span class="cs">"sk-proj-..."</span>
+<span class="ck">system_prompt</span>  = <span class="cs">"Eres el asistente de Ferretería XYZ..."</span>
+<span class="ck">airtable_base</span>  = <span class="cs">"appXXXXXXXXXXXXXX"</span>
+<span class="ck">plan</span>           = <span class="cs">"profesional"</span>
+<span class="ck">activo</span>         = <span class="cb">true</span>
+
+<span class="cm"># El número "To" del webhook de Twilio identifica al cliente</span>
+<span class="ck">twilio_to</span> = <span class="cv">{{1.To}}</span>  <span class="cm">← "whatsapp:+14155238886"</span>
+
+<span class="cm"># Buscar en tabla Tenants por twilio_number</span>
+<span class="ck">tenant</span> = Airtable.search({ twilio_number: <span class="cv">{{twilio_to}}</span> })
+
+<span class="cm"># Ahora tienes todo el contexto del cliente:</span>
+<span class="ck">system_prompt</span> = <span class="cv">{{tenant.system_prompt}}</span>
+<span class="ck">openai_key</span>    = <span class="cv">{{tenant.openai_key}}</span>
+<span class="ck">airtable_base</span> = <span class="cv">{{tenant.airtable_base}}</span>
+    </div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-title">Un escenario Make para todos los clientes</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><div class="step-content"><h4>Webhook único recibe de todos los números</h4><p>Todos los números de Twilio apuntan al mismo webhook de Make. El campo <code>To</code> del payload identifica a cuál cliente pertenece el mensaje.</p></div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-content"><h4>Lookup del tenant en Airtable Master</h4><p>La primera acción del escenario siempre busca el tenant en tu tabla maestra de configuración. Si no existe (número no configurado), el escenario termina con un log de error.</p></div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-content"><h4>Variables dinámicas por tenant</h4><p>System Prompt, API keys, Airtable base, y mensajes de bienvenida vienen todos de la tabla del tenant. Cambiar la configuración de un cliente es simplemente editar su fila en Airtable.</p></div></div>
+    <div class="step"><div class="step-num">04</div><div class="step-content"><h4>Datos aislados por Airtable Base</h4><p>Cada cliente tiene su propia Airtable Base (o al menos su propia tabla con <code>tenant_id</code>). Nunca mezclan datos. Puedes dar acceso de lectura al cliente a su base sin que vea la de otros.</p></div></div>
+  </div>
+</div>
+<div class="callout callout-ok">
+  <div class="callout-lbl">✅ Escalabilidad</div>
+  <p>Con esta arquitectura, agregar un nuevo cliente es: 1) Crear fila en tabla Tenants, 2) Conectar su número Twilio al mismo webhook, 3) Configurar su Airtable Base. El escenario de Make no se toca. <strong>Puedes gestionar 50 clientes con el mismo escenario.</strong></p>
+</div>`;}},
+{id:'l4-2',title:'Panel de administración del servicio',content:function(){return `
+<div class="lhdr">
+  <div class="ltag">Módulo 4 · Lección 2</div>
+  <h2 class="ltitle">Panel de Administración del Servicio Multi-Cliente</h2>
+  <p class="ldesc">Construye un panel mínimo pero funcional para gestionar todos tus clientes, sus configuraciones y sus métricas desde un solo lugar.</p>
+</div>
+<div class="sec">
+  <div class="sec-title">Estructura del panel en Airtable</div>
+  <table class="tbl">
+    <thead><tr><th>Vista</th><th>Qué muestra</th><th>Para quién</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Tenants Grid</strong></td><td>Todos los clientes, plan, status, fecha de vencimiento</td><td>Tú (admin)</td></tr>
+      <tr><td><strong>Métricas por Tenant</strong></td><td>Leads/semana, tasa de respuesta, tokens usados</td><td>Tú y el cliente</td></tr>
+      <tr><td><strong>Errores Recientes</strong></td><td>Últimos 50 errores del escenario Make con tenant_id</td><td>Tú (técnico)</td></tr>
+      <tr><td><strong>Vencimientos</strong></td><td>Clientes cuyo plan vence en los próximos 7 días</td><td>Tú (ventas)</td></tr>
+      <tr><td><strong>Actividad Hoy</strong></td><td>Conversaciones en las últimas 24h por cliente</td><td>Tú (operaciones)</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="sec">
+  <div class="sec-title">Automatizar reporte semanal al cliente</div>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><div class="code-dot" style="background:#ff5f57"></div><div class="code-dot" style="background:#febc2e"></div><div class="code-dot" style="background:#28c840"></div></div><span class="code-lang">ESCENARIO</span><span class="code-file">Make — Reporte semanal automático</span></div>
+    <div class="code-body">
+<span class="cm"># Trigger: Schedule → Every Monday at 8am</span>
+
+<span class="cm"># 1. Obtener todos los tenants activos de Airtable</span>
+Airtable.search({ activo: <span class="cb">true</span> })
+
+<span class="cm"># 2. Para cada tenant (Iterator):</span>
+<span class="ck">leads_semana</span>    = Airtable.count({ tenant_id, last_7_days })
+<span class="ck">fuera_horario</span>   = Airtable.count({ tenant_id, fuera_horario: <span class="cb">true</span>, last_7_days })
+<span class="ck">tokens_semana</span>   = Airtable.sum({ tenant_id, campo: total_tokens, last_7_days })
+<span class="ck">costo_estimado</span>  = <span class="cv">{{tokens_semana * 0.00000015}}</span>
+
+<span class="cm"># 3. Generar resumen con OpenAI</span>
+System: <span class="cs">"Genera un resumen ejecutivo de estas métricas"</span>
+Input: <span class="cv">{{JSON de métricas}}</span>
+
+<span class="cm"># 4. Enviar por email (Gmail) al contacto del tenant</span>
+Subject: <span class="cs">"📊 Reporte semanal de tu chatbot — {{tenant.nombre}}"</span>
+Body: <span class="cv">{{resumen_gpt}}</span>
+    </div>
+  </div>
+</div>`;}},
+]},
+{id:'m5',title:'Deployment y Mantenimiento',lessons:[
+{id:'l5-1',title:'Checklist de deployment a producción',content:function(){return `
+<div class="lhdr">
+  <div class="ltag">Módulo 5 · Lección 1</div>
+  <h2 class="ltitle">Checklist Completo de Deployment a Producción</h2>
+  <p class="ldesc">Antes de dar acceso a un cliente real a tu chatbot, verifica cada punto de esta lista. Un despliegue apresurado genera errores en producción que dañan la relación con el cliente.</p>
+</div>
+<div class="sec">
+  <div class="sec-title">Checklist de infraestructura</div>
+  <table class="tbl">
+    <thead><tr><th>Ítem</th><th>Verificación</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>Número Twilio de producción</td><td>Número real aprobado por Meta (no sandbox)</td><td><span class="tag tag-g">Verificar</span></td></tr>
+      <tr><td>Variables de entorno</td><td>SID, Token, API Keys en Make como variables protegidas</td><td><span class="tag tag-g">Verificar</span></td></tr>
+      <tr><td>Webhook en producción</td><td>URL de Make activa y apuntando al escenario correcto</td><td><span class="tag tag-g">Verificar</span></td></tr>
+      <tr><td>Error handlers</td><td>Todos los módulos críticos tienen handlers configurados</td><td><span class="tag tag-g">Verificar</span></td></tr>
+      <tr><td>Rate limiting</td><td>Límite de mensajes por usuario configurado</td><td><span class="tag tag-g">Verificar</span></td></tr>
+      <tr><td>Backup de Airtable</td><td>Export automático semanal de datos del cliente</td><td><span class="tag tag-g">Verificar</span></td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="sec">
+  <div class="sec-title">Checklist de comportamiento del bot</div>
+  <table class="tbl">
+    <thead><tr><th>Escenario de prueba</th><th>Resultado esperado</th></tr></thead>
+    <tbody>
+      <tr><td>Primer mensaje de usuario nuevo</td><td>Bot saluda, pide nombre, muestra menú</td></tr>
+      <tr><td>Pregunta dentro del scope</td><td>Respuesta correcta en &lt;5 segundos</td></tr>
+      <tr><td>Pregunta fuera del scope</td><td>Bot redirige educadamente, no inventa información</td></tr>
+      <tr><td>Usuario escribe "hablar con persona"</td><td>Handoff a agente humano con notificación</td></tr>
+      <tr><td>Mensaje fuera de horario</td><td>Captura datos y confirma seguimiento al día siguiente</td></tr>
+      <tr><td>OpenAI tarda más de 30 segundos</td><td>Bot envía mensaje de espera, no queda en silencio</td></tr>
+      <tr><td>Usuario lleva 20+ mensajes en 1h</td><td>Rate limit activado con mensaje claro</td></tr>
+      <tr><td>Mensaje con emoji o caracteres especiales</td><td>Bot procesa correctamente sin errores</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="sec">
+  <div class="sec-title">Proceso de onboarding de nuevo cliente</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><div class="step-content"><h4>Reunión de descubrimiento (45 min)</h4><p>Recopilar: casos de uso principales, FAQs frecuentes, tono de marca, horario de atención, productos y precios, frases que NO debe decir el bot.</p></div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-content"><h4>Crear tenant en sistema</h4><p>Agregar fila en Airtable Master. Crear Airtable Base del cliente. Configurar número Twilio. Escribir System Prompt personalizado basado en la reunión.</p></div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-content"><h4>Semana de pruebas privadas</h4><p>El cliente prueba el bot en modo sandbox. Feedback y ajustes al System Prompt y flujos. Mínimo 50 conversaciones de prueba antes de lanzar.</p></div></div>
+    <div class="step"><div class="step-num">04</div><div class="step-content"><h4>Lanzamiento gradual</h4><p>Primero compartir el número con 10-20 clientes de confianza del negocio. Monitorear métricas por 48h. Si todo OK, abrir al público general.</p></div></div>
+  </div>
+</div>
+<div class="callout callout-ok">
+  <div class="callout-lbl">🏆 Fin del Curso Avanzado</div>
+  <p>Has completado ambos capítulos del curso avanzado de Chatbot IA. Ahora tienes el conocimiento para: configurar Twilio en producción, gestionar memoria con OpenAI, construir escenarios robustos en Make, integrar CRMs y pagos, autenticar usuarios, y escalar a múltiples clientes. El siguiente paso es implementar. ¡Empieza por el Capítulo 1 y construye en capas!</p>
+</div>`;}},
+]},
+];
+
+var done=new Set(),cur=null;
+var all=MODS.reduce(function(a,m){return a.concat(m.lessons);},[]);
+
+function pct(){var p=Math.round(done.size/all.length*100);document.getElementById('pct').textContent=p+'%';document.getElementById('pbar').style.width=p+'%';}
+
+function sidebar(){
+  var el=document.getElementById('sidenav');el.innerHTML='';
+  MODS.forEach(function(m,mi){
+    var g=document.createElement('div');
+    var mb=document.createElement('button');mb.className='mod-btn';
+    mb.innerHTML='<span>'+m.title+'</span><span class="mod-badge">M'+(mi+1)+'</span>';
+    g.appendChild(mb);
+    m.lessons.forEach(function(l){
+      var b=document.createElement('button');
+      b.className='les-btn'+(done.has(l.id)?' done':'')+(cur===l.id?' active':'');
+      b.innerHTML='<span class="lcheck">'+(done.has(l.id)?'✓':'○')+'</span>'+l.title;
+      b.onclick=function(){load(l.id);};
+      g.appendChild(b);
+    });
+    el.appendChild(g);
+  });
+}
+
+function load(id){
+  var l=all.find(function(x){return x.id===id;});if(!l)return;
+  cur=id;
+  var c=document.getElementById('content');
+  c.innerHTML=l.content();
+  var cb=document.createElement('button');
+  cb.className='complete-btn'+(done.has(id)?' done':'');
+  cb.textContent=done.has(id)?'✓ Completada':'Marcar como completada';
+  cb.onclick=function(){done.add(id);cb.className='complete-btn done';cb.textContent='✓ Completada';pct();sidebar();};
+  c.appendChild(cb);
+  var nav=document.createElement('div');nav.className='lesson-nav';
+  var idx=all.findIndex(function(x){return x.id===id;});
+  var prev=all[idx-1],next=all[idx+1];
+  var pb=document.createElement('button');pb.className='nav-btn';pb.innerHTML='← Anterior';pb.disabled=!prev;
+  pb.onclick=function(){if(prev)load(prev.id);};
+  var nb=document.createElement('button');nb.className='nav-btn primary';
+  nb.innerHTML=next?'Siguiente →':'🎓 Curso Completado';
+  nb.onclick=function(){if(next)load(next.id);};
+  nav.appendChild(pb);nav.appendChild(nb);c.appendChild(nav);
+  sidebar();c.scrollTop=0;window.scrollTo(0,0);
+}
+
+sidebar();load(all[0].id);
+</script>
+</body>
+</html>
